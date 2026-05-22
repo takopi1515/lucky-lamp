@@ -1,0 +1,1708 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>lucky LAMP</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+:root{
+  --bg:#06060c;
+  --panel:#0e0e1a;
+  --border:#1e1e30;
+  --gold:#ffe040;
+  --gold2:#ffaa00;
+  --orange:#ff6600;
+  --dim:#444;
+}
+body{
+  background:var(--bg);color:#fff;
+  font-family:'Noto Sans JP',sans-serif;
+  min-height:100vh;overflow:hidden;user-select:none;
+}
+
+/* ===== FIXED ADS ===== */
+.fixed-ad{
+  position:fixed;left:0;right:0;z-index:500;
+  height:44px;
+  background:#08081a;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  padding:0 12px;overflow:hidden;
+}
+.fixed-ad::after{
+  content:'';position:absolute;top:0;left:-80%;width:35%;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.03),transparent);
+  animation:fadShim 4s infinite;
+}
+@keyframes fadShim{to{left:130%;}}
+#ad-top{top:0;border-bottom:1px solid #1e1e38;}
+#ad-bottom{bottom:0;border-top:1px solid #1e1e38;}
+.fad-tag{font-size:9px;color:#3a3a3a;border:1px solid #252525;padding:1px 5px;border-radius:3px;white-space:nowrap;flex-shrink:0;}
+.fad-txt{font-size:11px;color:#666;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;text-align:center;}
+.fad-btn{font-size:10px;font-weight:900;background:linear-gradient(135deg,var(--gold2),var(--gold));color:#000;border:none;padding:4px 10px;border-radius:4px;cursor:pointer;white-space:nowrap;flex-shrink:0;}
+
+/* ===== SCREENS ===== */
+.screen{
+  position:fixed;
+  top:44px;bottom:44px;left:0;right:0;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;
+  transition:opacity 0.35s ease;
+}
+.screen.active{opacity:1;pointer-events:all;}
+#s-opening,#s-ad{top:0;bottom:0;}
+
+/* ========== OPENING ========== */
+#s-opening{background:#000;z-index:100;}
+.op-wrap{display:flex;flex-direction:column;align-items:center;gap:6px;}
+.op-logo-small{
+  font-family:'Bebas Neue',cursive;
+  font-size:clamp(18px,5vw,28px);
+  letter-spacing:0.55em;color:#555;
+  animation:opFade 0.5s ease 0.8s both;
+}
+.op-logo-big{
+  font-family:'Bebas Neue',cursive;
+  font-size:clamp(70px,20vw,130px);
+  letter-spacing:0.06em;line-height:0.9;
+  background:linear-gradient(180deg,#fff 0%,var(--gold) 50%,var(--orange) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  filter:drop-shadow(0 0 28px rgba(255,180,0,0.7));
+  animation:opPop 0.7s cubic-bezier(.2,.8,.3,1.4) 0.25s both;
+}
+.op-progress{
+  width:min(240px,55vw);height:2px;
+  background:#111;border-radius:2px;overflow:hidden;
+  margin-top:36px;
+  animation:opFade 0.4s ease 1.2s both;
+}
+.op-bar{
+  height:100%;width:0;
+  background:linear-gradient(90deg,var(--gold2),var(--gold));
+  box-shadow:0 0 8px var(--gold);
+  animation:opLoad 1.8s ease 1.3s forwards;
+}
+@keyframes opPop{from{opacity:0;transform:scale(0.4);}to{opacity:1;transform:scale(1);}}
+@keyframes opFade{from{opacity:0;}to{opacity:1;}}
+@keyframes opLoad{to{width:100%;}}
+
+/* ========== AD ========== */
+#s-ad{background:rgba(0,0,0,0.95);z-index:90;}
+.ad-card{
+  background:linear-gradient(160deg,#12122a,#0a0a18);
+  border:1px solid #2a2a4a;border-radius:20px;
+  width:min(340px,88vw);overflow:hidden;position:relative;
+}
+.ad-close{
+  position:absolute;top:12px;right:12px;
+  width:34px;height:34px;border-radius:50%;
+  background:rgba(255,255,255,0.07);border:1px solid #333;
+  color:#777;font-size:17px;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:all 0.2s;z-index:2;
+}
+.ad-close:hover{background:rgba(255,255,255,0.14);color:#fff;}
+.ad-top{
+  background:linear-gradient(135deg,#1c1c3e,#0e0e28);
+  padding:30px 20px 22px;text-align:center;
+  border-bottom:1px solid #222244;
+}
+.ad-icon{font-size:52px;display:block;margin-bottom:14px;}
+.ad-title{font-family:'Bebas Neue',cursive;font-size:28px;letter-spacing:0.1em;color:var(--gold);}
+.ad-desc{font-size:12px;color:#666;margin-top:8px;line-height:1.7;}
+.ad-body{padding:18px 20px;}
+.ad-cta{
+  width:100%;padding:14px;
+  font-family:'Bebas Neue',cursive;font-size:22px;letter-spacing:0.15em;
+  background:linear-gradient(135deg,var(--gold2),var(--gold));
+  color:#111;border:none;border-radius:10px;cursor:pointer;
+  box-shadow:0 0 18px rgba(255,160,0,0.4);
+}
+.ad-note{font-size:9px;color:#333;letter-spacing:0.2em;text-align:center;margin-top:10px;}
+
+/* ========== GAME MENU ========== */
+#s-menu{background:var(--bg);z-index:80;}
+.menu-wrap{
+  width:min(380px,92vw);
+  display:flex;flex-direction:column;gap:20px;
+}
+.menu-logo{
+  text-align:center;
+  font-family:'Bebas Neue',cursive;
+  line-height:1;
+}
+.menu-logo .ml-small{font-size:16px;letter-spacing:0.6em;color:#555;}
+.menu-logo .ml-big{
+  font-size:clamp(48px,13vw,80px);letter-spacing:0.08em;
+  background:linear-gradient(180deg,#fff,var(--gold) 60%,var(--orange));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  filter:drop-shadow(0 0 12px rgba(255,180,0,0.5));
+}
+
+.menu-card{
+  background:var(--panel);border:1px solid var(--border);
+  border-radius:14px;padding:18px;
+  display:flex;flex-direction:column;gap:14px;
+}
+.menu-sec-title{font-size:9px;color:var(--dim);letter-spacing:0.35em;text-transform:uppercase;}
+
+.prob-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.ptab{
+  background:rgba(255,255,255,0.03);border:1px solid var(--border);
+  border-radius:10px;padding:13px 8px;text-align:center;cursor:pointer;
+  transition:all 0.18s;position:relative;overflow:hidden;
+}
+.ptab::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:transparent;transition:background 0.18s;
+}
+.ptab.active{border-color:rgba(255,200,0,0.45);background:rgba(255,180,0,0.07);}
+.ptab.active::before{background:linear-gradient(90deg,var(--gold2),var(--gold));}
+.ptab .pt-lbl{font-size:9px;color:var(--dim);letter-spacing:0.15em;}
+.ptab .pt-val{font-family:'Bebas Neue',cursive;font-size:23px;color:#888;margin-top:4px;}
+.ptab.active .pt-val{color:var(--gold);}
+.ptab-free{grid-column:span 2;}
+
+.free-slider{
+  display:none;flex-direction:column;gap:10px;
+  background:rgba(0,0,0,0.3);border-radius:10px;padding:14px;
+}
+.free-slider.show{display:flex;}
+.sl-row{display:flex;justify-content:space-between;align-items:baseline;}
+.sl-lbl{font-size:11px;color:var(--dim);}
+.sl-val{font-family:'Bebas Neue',cursive;font-size:30px;color:var(--gold);}
+input[type=range]{
+  width:100%;-webkit-appearance:none;
+  height:4px;background:#1a1a2a;border-radius:2px;outline:none;
+}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:22px;height:22px;border-radius:50%;
+  background:radial-gradient(circle at 38% 35%,#fff,var(--gold));
+  cursor:pointer;box-shadow:0 0 10px var(--gold),0 0 20px var(--gold2);
+}
+
+.start-btn{
+  width:100%;padding:19px;
+  font-family:'Bebas Neue',cursive;font-size:28px;letter-spacing:0.2em;
+  background:linear-gradient(135deg,#a06000,var(--gold2),var(--gold),#fff8c0,var(--gold),var(--gold2),#a06000);
+  background-size:300% 300%;
+  color:#111;border:none;border-radius:14px;cursor:pointer;
+  box-shadow:0 0 24px rgba(255,160,0,0.45),0 4px 0 rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.3);
+  animation:btnShine 2.5s linear infinite;
+  position:relative;overflow:hidden;
+  transition:transform 0.1s;
+}
+.start-btn::after{
+  content:'';position:absolute;top:0;left:-60%;width:35%;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.28),transparent);
+  animation:btnGlare 2.2s ease-in-out infinite;
+}
+@keyframes btnGlare{0%,100%{left:-60%;}60%{left:120%;}}
+@keyframes btnShine{0%{background-position:0% 50%;}50%{background-position:100% 50%;}100%{background-position:0% 50%;}}
+.start-btn:active{transform:scale(0.97) translateY(2px);}
+
+/* ========== GAME ========== */
+#s-game{background:var(--bg);z-index:10;justify-content:flex-start;overflow-y:auto;}
+.game-inner{
+  width:100%;max-width:420px;margin:0 auto;
+  padding:0 14px 20px;
+  display:flex;flex-direction:column;gap:16px;min-height:100%;
+}
+.g-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 0 0;
+}
+.g-logo{
+  font-family:'Bebas Neue',cursive;
+  font-size:14px;letter-spacing:0.4em;color:#555;
+}
+.g-logo span{
+  font-size:28px;letter-spacing:0.1em;
+  background:linear-gradient(180deg,#fff,var(--gold));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.g-menu-btn{
+  width:40px;height:40px;border-radius:10px;
+  background:var(--panel);border:1px solid var(--border);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;
+  cursor:pointer;transition:border-color 0.2s;
+}
+.g-menu-btn span{display:block;width:18px;height:2px;background:var(--gold);border-radius:2px;}
+.g-menu-btn:hover{border-color:var(--gold);}
+
+/* turn display */
+.turn-display{
+  background:var(--panel);border:1px solid var(--border);
+  border-radius:12px;padding:14px 16px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.turn-left{display:flex;flex-direction:column;}
+.turn-lbl{font-size:9px;color:var(--dim);letter-spacing:0.3em;}
+.turn-num{
+  font-family:'Bebas Neue',cursive;
+  font-size:56px;line-height:1;color:#fff;
+}
+.turn-right{display:flex;flex-direction:column;align-items:flex-end;gap:8px;}
+.prob-pill{
+  background:rgba(255,200,0,0.1);border:1px solid rgba(255,200,0,0.3);
+  border-radius:20px;padding:5px 12px;
+  font-family:'Bebas Neue',cursive;font-size:18px;color:var(--gold);
+}
+.hit-info{font-size:10px;color:var(--dim);letter-spacing:0.1em;text-align:right;}
+
+/* ===== GOGO LAMP PANEL ===== */
+.lamp-section{
+  display:flex;justify-content:center;align-items:center;
+  padding:4px 0;
+}
+
+/* 筐体本体 */
+.gogo-body{
+  background:linear-gradient(180deg,#1a0a00,#0e0600,#1a0a00);
+  border:3px solid #3a1800;
+  border-radius:18px;
+  padding:10px 10px 14px;
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  position:relative;
+  box-shadow:
+    0 0 0 1px #5a2800,
+    inset 0 0 30px rgba(0,0,0,0.8),
+    0 4px 24px rgba(0,0,0,0.6);
+  width:min(340px,90vw);
+}
+
+/* 上部ネオンサイン */
+.gogo-sign{
+  background:linear-gradient(180deg,#1e0800,#2a0e00);
+  border:2px solid #4a1e00;
+  border-radius:10px;
+  width:100%;padding:6px 0;
+  text-align:center;
+  position:relative;overflow:hidden;
+}
+.gogo-sign::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);
+  opacity:0.5;
+}
+.gogo-sign-text{
+  font-family:'Bebas Neue',cursive;
+  font-size:clamp(22px,6vw,32px);
+  letter-spacing:0.18em;
+  background:linear-gradient(180deg,#fff 0%,var(--gold) 40%,var(--gold2) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  filter:drop-shadow(0 0 6px var(--gold2));
+  animation:signFlicker 5s ease-in-out infinite;
+}
+@keyframes signFlicker{
+  0%,94%,96%,98%,100%{opacity:1;}
+  95%,97%{opacity:0.7;}
+}
+
+/* ネオン枠ライン */
+.gogo-neon-bar{
+  width:100%;height:3px;
+  background:linear-gradient(90deg,transparent 0%,var(--red) 20%,#ff4400 35%,var(--gold) 50%,#ff4400 65%,var(--red) 80%,transparent 100%);
+  border-radius:2px;
+  box-shadow:0 0 6px var(--red),0 0 12px var(--orange);
+  opacity:0.8;
+}
+
+/* ランプグリッド → 中央1灯 */
+.gogo-grid{
+  display:flex;
+  align-items:center;justify-content:center;
+  padding:10px 0;
+}
+.gogo-lamp{
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+}
+/* 1個のランプ・中央大型 */
+.gogo-socket{
+  width:clamp(130px,38vw,160px);
+  height:clamp(130px,38vw,160px);
+  border-radius:50%;
+  background:radial-gradient(circle at 40% 35%, #1e1208, #060402);
+  border:3px solid #2a1400;
+  position:relative;
+  display:flex;align-items:center;justify-content:center;
+  overflow:visible;
+  box-shadow:inset 0 2px 6px rgba(0,0,0,0.8), 0 1px 0 rgba(255,150,0,0.08);
+  transition:all 0.05s;
+}
+/* 外周リング（暗時） */
+.gogo-socket::before{
+  content:'';
+  position:absolute;inset:-3px;
+  border-radius:50%;
+  border:2px solid #1a0c00;
+  transition:all 0.05s;
+}
+/* 電球本体 */
+.gogo-bulb{
+  width:78%;height:78%;
+  border-radius:50%;
+  background:radial-gradient(circle at 40% 35%, #1a1008, #050302);
+  position:relative;z-index:2;
+  transition:all 0.05s;
+  overflow:hidden;
+}
+/* 電球の光沢 */
+.gogo-bulb::after{
+  content:'';
+  position:absolute;top:10%;left:18%;
+  width:32%;height:20%;
+  border-radius:50%;
+  background:radial-gradient(ellipse,rgba(255,255,255,0.07),transparent 70%);
+}
+/* ソケット下部の突起 */
+.gogo-stem{
+  width:22%;height:10px;
+  background:linear-gradient(180deg,#2a1400,#1a0c00);
+  border-radius:0 0 3px 3px;
+  border:1px solid #3a1800;border-top:none;
+}
+.gogo-lbl{
+  font-family:'Bebas Neue',cursive;
+  font-size:clamp(18px,5vw,24px);
+  letter-spacing:0.2em;
+  color:#2a1000;
+  transition:color 0.1s;
+  line-height:1;
+}
+
+/* ON - 点灯後ずっと光り続けるパルス */
+.gogo-socket.on{
+  background:radial-gradient(circle at 40% 35%, #fff8c0 0%, #ffe040 25%, #ffaa00 55%, #ff4400 80%, #cc1500 100%);
+  border-color:var(--gold);
+  box-shadow:
+    0 0 0 3px rgba(255,160,0,0.4),
+    0 0 16px var(--gold),
+    0 0 36px var(--gold2),
+    0 0 70px rgba(255,120,0,0.5),
+    inset 0 0 12px rgba(255,240,180,0.25);
+  animation:lampKeepOn 1.4s ease-in-out infinite;
+}
+@keyframes lampKeepOn{
+  0%,100%{box-shadow:0 0 0 3px rgba(255,160,0,0.4),0 0 16px var(--gold),0 0 36px var(--gold2),0 0 70px rgba(255,120,0,0.5),inset 0 0 12px rgba(255,240,180,0.25);}
+  50%{box-shadow:0 0 0 6px rgba(255,180,0,0.5),0 0 40px var(--gold),0 0 80px var(--gold2),0 0 130px rgba(255,120,0,0.6),inset 0 0 24px rgba(255,250,200,0.35);}
+}
+.gogo-socket.on::before{
+  border-color:rgba(255,200,0,0.6);
+  box-shadow:0 0 8px var(--gold);
+}
+.gogo-socket.on .gogo-bulb{
+  background:radial-gradient(circle at 40% 35%, #fffef0 0%, #fff5a0 30%, #ffe040 65%, rgba(255,180,0,0.3) 100%);
+  box-shadow:0 0 8px #fff, 0 0 16px var(--gold);
+}
+.gogo-socket.on .gogo-bulb::after{
+  background:radial-gradient(ellipse,rgba(255,255,255,0.55),transparent 65%);
+}
+.gogo-lamp.lit .gogo-lbl{
+  color:var(--gold);
+  text-shadow:0 0 6px var(--gold2);
+}
+
+/* ===== ガコ白フラッシュ ===== */
+.gogo-socket.gako-flash{
+  background:radial-gradient(circle, #ffffff 0%, #ffffee 40%, #ffeeaa 70%) !important;
+  border-color:#fff !important;
+  box-shadow:
+    0 0 0 5px rgba(255,255,255,0.6),
+    0 0 30px #fff,
+    0 0 60px rgba(255,255,220,0.8) !important;
+  transition:none !important;
+}
+
+/* ===== 先行点灯演出（luckylabel） ===== */
+
+/* 通常先行：文字がじわっと光る */
+.gogo-lbl.senko-normal{
+  color:var(--gold) !important;
+  text-shadow:0 0 8px var(--gold),0 0 16px var(--gold2) !important;
+  animation:senkoNormal 0.4s ease-in-out infinite alternate;
+}
+@keyframes senkoNormal{
+  from{text-shadow:0 0 6px var(--gold2),0 0 12px var(--gold);}
+  to  {text-shadow:0 0 14px #fff,0 0 24px var(--gold),0 0 40px var(--gold2);}
+}
+
+/* 虹色先行 */
+.gogo-lbl.senko-rainbow{
+  animation:senkoRainbow 0.5s linear infinite !important;
+}
+@keyframes senkoRainbow{
+  0%  {color:#ff4444;text-shadow:0 0 12px #ff4444,0 0 24px #ff0000;}
+  17% {color:#ff9900;text-shadow:0 0 12px #ff9900,0 0 24px #ff6600;}
+  33% {color:#ffee00;text-shadow:0 0 12px #ffee00,0 0 24px #ffcc00;}
+  50% {color:#44ff44;text-shadow:0 0 12px #44ff44,0 0 24px #00cc00;}
+  67% {color:#44aaff;text-shadow:0 0 12px #44aaff,0 0 24px #0066ff;}
+  83% {color:#cc44ff;text-shadow:0 0 12px #cc44ff,0 0 24px #aa00ff;}
+  100%{color:#ff4444;text-shadow:0 0 12px #ff4444,0 0 24px #ff0000;}
+}
+
+/* 激しく先行 */
+.gogo-lbl.senko-flash{
+  animation:senkoFlash 0.12s ease-in-out infinite !important;
+}
+@keyframes senkoFlash{
+  0%,100%{color:var(--gold);text-shadow:0 0 6px var(--gold2);}
+  50%{color:#fff;text-shadow:0 0 16px #fff,0 0 30px var(--gold),0 0 50px var(--gold2);}
+}
+
+/* レインボー */
+.gogo-socket.premium-rainbow{
+  animation:rainbowLoop 1.2s linear infinite !important;
+  border-color:#fff !important;
+}
+@keyframes rainbowLoop{
+  0%  {background:radial-gradient(circle at 40% 35%,#fff 0%,#ff4444 30%,#cc0000 70%);box-shadow:0 0 0 4px rgba(255,80,80,0.5),0 0 30px #ff4444,0 0 70px #ff0000;}
+  17% {background:radial-gradient(circle at 40% 35%,#fff 0%,#ff9900 30%,#cc6600 70%);box-shadow:0 0 0 4px rgba(255,160,0,0.5),0 0 30px #ff9900,0 0 70px #ff6600;}
+  33% {background:radial-gradient(circle at 40% 35%,#fff 0%,#ffee00 30%,#ccaa00 70%);box-shadow:0 0 0 4px rgba(255,220,0,0.5),0 0 30px #ffee00,0 0 70px #ffcc00;}
+  50% {background:radial-gradient(circle at 40% 35%,#fff 0%,#44ff44 30%,#00aa00 70%);box-shadow:0 0 0 4px rgba(80,255,80,0.5),0 0 30px #44ff44,0 0 70px #00cc00;}
+  67% {background:radial-gradient(circle at 40% 35%,#fff 0%,#44aaff 30%,#0055cc 70%);box-shadow:0 0 0 4px rgba(80,160,255,0.5),0 0 30px #44aaff,0 0 70px #0066ff;}
+  83% {background:radial-gradient(circle at 40% 35%,#fff 0%,#cc44ff 30%,#8800cc 70%);box-shadow:0 0 0 4px rgba(200,80,255,0.5),0 0 30px #cc44ff,0 0 70px #aa00ff;}
+  100%{background:radial-gradient(circle at 40% 35%,#fff 0%,#ff4444 30%,#cc0000 70%);box-shadow:0 0 0 4px rgba(255,80,80,0.5),0 0 30px #ff4444,0 0 70px #ff0000;}
+}
+
+/* フラッシュ */
+.gogo-socket.premium-flash{
+  animation:flashLoop 0.18s ease-in-out infinite !important;
+  background:radial-gradient(circle at 40% 35%,#fff 0%,#ffe040 25%,#ffaa00 55%,#ff4400 80%) !important;
+  border-color:var(--gold) !important;
+}
+@keyframes flashLoop{
+  0%,100%{
+    box-shadow:0 0 0 4px rgba(255,200,0,0.6),0 0 40px var(--gold),0 0 90px var(--gold2),0 0 140px rgba(255,120,0,0.7);
+    filter:brightness(1.2);
+  }
+  50%{
+    box-shadow:0 0 0 8px rgba(255,255,200,0.8),0 0 80px #fff,0 0 150px var(--gold),0 0 200px var(--gold2);
+    filter:brightness(2);
+  }
+}
+
+/* ウェーブ（色変化） */
+.gogo-socket.premium-wave{
+  animation:waveLoop 0.8s ease-in-out infinite !important;
+}
+@keyframes waveLoop{
+  0%,100%{
+    background:radial-gradient(circle at 40% 35%,#fff8c0 0%,#ffe040 25%,#ffaa00 55%,#ff4400 80%);
+    box-shadow:0 0 0 4px rgba(255,160,0,0.5),0 0 30px var(--gold),0 0 70px var(--gold2);
+    border-color:var(--gold);
+  }
+  25%{
+    background:radial-gradient(circle at 40% 35%,#ffffff 0%,#ff88ff 30%,#cc00cc 65%,#880088 90%);
+    box-shadow:0 0 0 4px rgba(255,100,255,0.5),0 0 30px #ff88ff,0 0 70px #cc00cc;
+    border-color:#ff88ff;
+  }
+  50%{
+    background:radial-gradient(circle at 40% 35%,#ffffff 0%,#88ffff 30%,#00aacc 65%,#004488 90%);
+    box-shadow:0 0 0 4px rgba(100,220,255,0.5),0 0 30px #88ffff,0 0 70px #00ccff;
+    border-color:#88ffff;
+  }
+  75%{
+    background:radial-gradient(circle at 40% 35%,#ffffff 0%,#88ff88 30%,#00aa44 65%,#004422 90%);
+    box-shadow:0 0 0 4px rgba(100,255,150,0.5),0 0 30px #88ff88,0 0 70px #00cc66;
+    border-color:#88ff88;
+  }
+}
+
+/* プレミアラベル */
+.premium-label{
+  position:fixed;top:60px;left:0;right:0;
+  text-align:center;z-index:300;
+  font-family:'Bebas Neue',cursive;
+  font-size:clamp(18px,5vw,26px);
+  letter-spacing:0.2em;
+  pointer-events:none;
+  opacity:0;
+  transform:translateY(-10px);
+  transition:all 0.4s ease;
+}
+.premium-label.show{opacity:1;transform:translateY(0);}
+.premium-label.rainbow{color:#fff;text-shadow:0 0 10px #ff4444,0 0 20px #ff9900,0 0 30px #44ff44;}
+.premium-label.flash{color:var(--gold);text-shadow:0 0 10px #fff,0 0 20px var(--gold),0 0 40px var(--gold2);}
+.premium-label.wave{color:#88ffff;text-shadow:0 0 10px #88ffff,0 0 20px #ff88ff,0 0 30px #88ff88;}
+.tap-wrap{display:flex;justify-content:center;}
+.tap-btn{
+  width:clamp(120px,38vw,150px);height:clamp(120px,38vw,150px);
+  border-radius:50%;
+  background:radial-gradient(circle, #d0d0d0 0%, #a0a0a0 45%, #707070 100%);
+  border:none;cursor:pointer;
+  box-shadow:
+    0 0 0 4px rgba(180,180,180,0.2),
+    0 4px 16px rgba(0,0,0,0.6),
+    0 6px 0 rgba(0,0,0,0.5),
+    inset 0 1px 0 rgba(255,255,255,0.15);
+  position:relative;overflow:hidden;
+  transition:transform 0.1s,box-shadow 0.1s;
+}
+.tap-btn:active{
+  transform:scale(0.93) translateY(4px);
+  box-shadow:0 0 0 3px rgba(180,180,180,0.15),0 1px 6px rgba(0,0,0,0.5),0 1px 0 rgba(0,0,0,0.4);
+}
+
+/* in-game menu drawer */
+#ig-overlay{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,0.7);opacity:0;pointer-events:none;transition:opacity 0.3s;}
+#ig-overlay.open{opacity:1;pointer-events:all;}
+#ig-drawer{
+  position:fixed;top:44px;right:-310px;bottom:44px;width:290px;z-index:51;
+  background:var(--panel);border-left:1px solid var(--border);
+  padding:22px 18px;display:flex;flex-direction:column;gap:18px;
+  transition:right 0.3s cubic-bezier(.4,0,.2,1);overflow-y:auto;
+}
+#ig-drawer.open{right:0;}
+.drawer-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding-bottom:14px;border-bottom:1px solid var(--border);
+}
+.drawer-title{font-family:'Bebas Neue',cursive;font-size:22px;letter-spacing:0.1em;color:var(--gold);}
+.drawer-close{
+  width:32px;height:32px;border-radius:8px;
+  background:rgba(255,255,255,0.05);border:1px solid var(--border);
+  color:#666;font-size:18px;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;
+}
+.drawer-sec{font-size:9px;color:var(--dim);letter-spacing:0.3em;text-transform:uppercase;margin-bottom:6px;}
+.drawer-prob-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.dp-tab{
+  background:rgba(255,255,255,0.03);border:1px solid var(--border);
+  border-radius:10px;padding:12px 6px;text-align:center;cursor:pointer;transition:all 0.18s;
+  position:relative;overflow:hidden;
+}
+.dp-tab::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:transparent;transition:background 0.18s;}
+.dp-tab.active{border-color:rgba(255,200,0,0.4);background:rgba(255,180,0,0.06);}
+.dp-tab.active::before{background:linear-gradient(90deg,var(--gold2),var(--gold));}
+.dp-tab .dp-lbl{font-size:9px;color:var(--dim);letter-spacing:0.12em;}
+.dp-tab .dp-val{font-family:'Bebas Neue',cursive;font-size:20px;color:#888;margin-top:3px;}
+.dp-tab.active .dp-val{color:var(--gold);}
+.dp-free{display:flex;flex-direction:column;gap:10px;background:rgba(0,0,0,0.3);border-radius:10px;padding:12px;display:none;}
+.dp-free.show{display:flex;}
+.reset-btn{
+  margin-top:auto;width:100%;padding:12px;
+  font-family:'Bebas Neue',cursive;font-size:17px;letter-spacing:0.1em;
+  background:rgba(255,255,255,0.04);border:1px solid var(--border);
+  color:#666;border-radius:10px;cursor:pointer;transition:all 0.2s;
+}
+.reset-btn:hover{background:rgba(255,50,50,0.1);border-color:#ff3333;color:#ff5555;}
+
+/* ===== FLASH ===== */
+#flash{position:fixed;inset:0;z-index:200;pointer-events:none;opacity:0;}
+#flash.go{animation:bigFlash 0.65s ease-out forwards;}
+@keyframes bigFlash{
+  0%{opacity:1;background:rgba(255,250,180,0.95);}
+  25%{opacity:0.7;background:rgba(255,200,0,0.6);}
+  55%{opacity:0.3;background:rgba(255,130,0,0.25);}
+  100%{opacity:0;}
+}
+
+/* ========== PREVIEW ========== */
+.preview-btn{
+  width:100%;padding:12px;
+  font-family:'Bebas Neue',cursive;font-size:17px;letter-spacing:0.1em;
+  background:rgba(255,200,0,0.08);border:1px solid rgba(255,200,0,0.3);
+  color:var(--gold);border-radius:10px;cursor:pointer;transition:all 0.2s;
+  margin-top:4px;
+}
+.preview-btn:hover{background:rgba(255,200,0,0.15);}
+#s-preview{background:var(--bg);z-index:60;justify-content:flex-start;overflow-y:auto;}
+.preview-wrap{
+  width:100%;max-width:420px;margin:0 auto;
+  padding:14px 14px 40px;
+  display:flex;flex-direction:column;gap:16px;
+}
+.preview-header{display:flex;align-items:center;justify-content:space-between;padding-top:4px;}
+.preview-title{font-family:'Bebas Neue',cursive;font-size:22px;letter-spacing:0.12em;color:var(--gold);}
+.preview-close{
+  width:36px;height:36px;border-radius:10px;
+  background:var(--panel);border:1px solid var(--border);
+  color:#888;font-size:18px;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;
+}
+.preview-lamp-area{
+  background:radial-gradient(ellipse at 50% 0%,#1a1200,#060608 65%);
+  border:1px solid #2a2000;border-radius:16px;
+  padding:20px;display:flex;flex-direction:column;align-items:center;gap:10px;
+}
+.preview-lamp-unit{display:flex;flex-direction:column;align-items:center;gap:5px;}
+.preview-effect-name{
+  font-family:'Bebas Neue',cursive;font-size:18px;letter-spacing:0.15em;
+  color:#555;min-height:24px;transition:color 0.3s;
+}
+.preview-sec{font-size:9px;color:var(--dim);letter-spacing:0.35em;text-transform:uppercase;margin-top:4px;}
+.preview-btns{display:flex;flex-direction:column;gap:8px;}
+.pv-btn{
+  background:var(--panel);border:1px solid var(--border);
+  border-radius:10px;padding:12px 14px;
+  display:flex;align-items:center;gap:12px;
+  cursor:pointer;transition:all 0.18s;text-align:left;width:100%;
+}
+.pv-btn:hover{border-color:rgba(255,200,0,0.4);background:rgba(255,180,0,0.06);}
+.pv-btn:active{transform:scale(0.98);}
+.pv-icon{font-size:22px;flex-shrink:0;}
+.pv-name{font-family:'Bebas Neue',cursive;font-size:18px;letter-spacing:0.1em;color:#ccc;flex:1;}
+.pv-desc{font-size:10px;color:#555;}
+.pv-full .pv-name{color:var(--gold);}
+.pv-full{border-color:rgba(255,200,0,0.2);}
+
+/* ========== RETRY ========== */
+#s-retry{background:rgba(0,0,0,0.97);z-index:80;}
+.retry-card{
+  background:linear-gradient(160deg,#12122a,#0a0a18);
+  border:1px solid #2a2a4a;border-radius:20px;
+  width:min(420px,96vw);overflow:hidden;
+}
+.retry-top{
+  background:linear-gradient(135deg,#1a1a3a,#0e0e26);
+  padding:28px 20px 22px;text-align:center;
+  border-bottom:1px solid #222244;
+}
+.retry-icon{font-size:52px;display:block;margin-bottom:10px;}
+.retry-title{
+  font-family:'Bebas Neue',cursive;font-size:14px;letter-spacing:0.5em;color:#555;
+}
+.retry-title-big{
+  font-family:'Bebas Neue',cursive;font-size:30px;letter-spacing:0.1em;
+  background:linear-gradient(180deg,#fff,var(--gold));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  margin-top:2px;
+}
+/* ===== SLOT MACHINE ===== */
+.slot-machine{
+  display:flex;flex-direction:column;align-items:center;gap:12px;
+  padding:8px 0;
+  width:100%;
+}
+.slot-frame{
+  background:linear-gradient(180deg,#0a0a0a,#111118);
+  border:3px solid #3a2800;
+  border-radius:14px;
+  padding:10px;
+  display:flex;gap:6px;
+  position:relative;
+  width:100%;
+  box-shadow:
+    0 0 0 1px #5a3800,
+    inset 0 2px 8px rgba(0,0,0,0.8),
+    0 0 20px rgba(255,160,0,0.15);
+}
+.slot-reel-wrap{
+  flex:1;
+  height:100px;
+  overflow:hidden;
+  background:#050505;
+  border:2px solid #2a1800;
+  border-radius:8px;
+  position:relative;
+  box-shadow:inset 0 4px 12px rgba(0,0,0,0.9);
+}
+/* 上下フェード */
+.slot-reel-wrap::before,
+.slot-reel-wrap::after{
+  content:'';position:absolute;left:0;right:0;z-index:3;height:22px;pointer-events:none;
+}
+.slot-reel-wrap::before{top:0;background:linear-gradient(180deg,rgba(5,5,5,0.95),transparent);}
+.slot-reel-wrap::after{bottom:0;background:linear-gradient(0deg,rgba(5,5,5,0.95),transparent);}
+
+.slot-reel{
+  display:flex;flex-direction:column;
+  transition:transform 0s;
+}
+.slot-sym{
+  width:100%;
+  height:100px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:52px;
+  flex-shrink:0;
+}
+
+/* 中央ライン */
+.slot-line{
+  position:absolute;
+  left:8px;right:8px;
+  top:50%;transform:translateY(-50%);
+  height:102px;margin-top:-1px;
+  border-top:2px solid rgba(255,180,0,0.5);
+  border-bottom:2px solid rgba(255,180,0,0.5);
+  pointer-events:none;z-index:2;
+}
+.slot-line.win{
+  border-color:var(--gold);
+  box-shadow:0 0 8px var(--gold),0 0 16px var(--gold2);
+  animation:lineFlash 0.4s ease-in-out 4;
+}
+@keyframes lineFlash{0%,100%{opacity:1;}50%{opacity:0.3;}}
+
+.slot-label{
+  font-family:'Bebas Neue',cursive;
+  font-size:22px;letter-spacing:0.15em;
+  background:linear-gradient(180deg,#fff,var(--gold));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  filter:drop-shadow(0 0 6px var(--gold2));
+  opacity:0;transition:opacity 0.5s;
+}
+.slot-label.show{opacity:1;}
+  display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px;
+}
+.rstat{background:rgba(0,0,0,0.35);border-radius:8px;padding:10px 8px;}
+.rstat-lbl{font-size:9px;color:var(--dim);letter-spacing:0.15em;}
+.rstat-val{font-family:'Bebas Neue',cursive;font-size:24px;color:var(--gold);margin-top:2px;}
+.retry-body{padding:18px 20px;display:flex;flex-direction:column;gap:10px;}
+/* retry ad */
+.retry-ad{
+  background:linear-gradient(135deg,#10101e,#14142a);
+  border:1px solid #222244;border-radius:10px;
+  padding:10px 14px;display:flex;align-items:center;gap:10px;
+  position:relative;overflow:hidden;
+}
+.retry-ad::after{
+  content:'';position:absolute;top:0;left:-80%;width:40%;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.04),transparent);
+  animation:adShim 3.5s infinite;
+}
+@keyframes adShim{to{left:130%;}}
+.r-ad-tag{font-size:9px;color:#444;border:1px solid #2a2a2a;padding:1px 5px;border-radius:3px;white-space:nowrap;}
+.r-ad-txt{font-size:12px;color:#777;flex:1;}
+.r-ad-btn{font-size:11px;font-weight:900;background:linear-gradient(135deg,var(--gold2),var(--gold));color:#000;border:none;padding:5px 11px;border-radius:5px;cursor:pointer;white-space:nowrap;}
+.share-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.share-btn{
+  padding:13px 8px;border-radius:10px;
+  font-family:'Bebas Neue',cursive;font-size:15px;letter-spacing:0.06em;
+  border:none;cursor:pointer;transition:all 0.18s;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+}
+.share-x{background:#111;border:1px solid #333;color:#fff;}
+.share-x:hover{background:#1a1a1a;}
+.share-menu{background:rgba(255,255,255,0.06);border:1px solid var(--border);color:#aaa;}
+.share-menu:hover{background:rgba(255,255,255,0.1);color:#fff;}
+.retry-again{
+  width:100%;padding:17px;
+  font-family:'Bebas Neue',cursive;font-size:26px;letter-spacing:0.15em;
+  background:linear-gradient(135deg,var(--gold2),var(--gold));
+  color:#111;border:none;border-radius:12px;cursor:pointer;
+  box-shadow:0 0 22px rgba(255,160,0,0.45);transition:transform 0.1s;
+}
+.retry-again:active{transform:scale(0.97);}
+
+/* ===== PARTICLES ===== */
+.ptcl{position:fixed;border-radius:50%;pointer-events:none;z-index:190;animation:ptfly var(--dur) ease-out forwards;}
+@keyframes ptfly{0%{transform:translate(0,0) scale(1);opacity:1;}100%{transform:translate(var(--tx),var(--ty)) scale(0);opacity:0;}}
+/* ===== SOUND / HOW BTN ===== */
+.sound-btn{
+  width:100%;padding:12px;
+  font-family:'Bebas Neue',cursive;font-size:17px;letter-spacing:0.1em;
+  background:rgba(255,255,255,0.04);border:1px solid var(--border);
+  color:#888;border-radius:10px;cursor:pointer;transition:all 0.2s;
+}
+.sound-btn.off{color:#444;border-color:#222;}
+.how-btn{
+  width:100%;padding:14px;
+  font-family:'Bebas Neue',cursify;font-size:20px;letter-spacing:0.15em;
+  background:rgba(255,255,255,0.04);border:1px solid var(--border);
+  color:#666;border-radius:12px;cursor:pointer;transition:all 0.2s;
+}
+/* ===== TUTORIAL ===== */
+#s-tutorial{background:var(--bg);z-index:75;justify-content:flex-start;overflow-y:auto;}
+.tutorial-wrap{width:100%;max-width:420px;margin:0 auto;padding:14px 14px 40px;display:flex;flex-direction:column;gap:16px;}
+.tutorial-header{display:flex;align-items:center;justify-content:space-between;padding-top:4px;}
+.tutorial-title{font-family:'Bebas Neue',cursive;font-size:26px;letter-spacing:0.15em;background:linear-gradient(180deg,#fff,var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.tutorial-close{width:36px;height:36px;border-radius:10px;background:var(--panel);border:1px solid var(--border);color:#888;font-size:18px;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.tutorial-list{display:flex;flex-direction:column;gap:12px;}
+.tut-item{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:14px;display:flex;gap:14px;align-items:flex-start;position:relative;overflow:hidden;}
+.tut-item::before{content:'';position:absolute;top:0;left:0;bottom:0;width:3px;background:linear-gradient(180deg,var(--gold2),var(--gold));}
+.tut-num{font-family:'Bebas Neue',cursive;font-size:32px;line-height:1;color:var(--gold);opacity:0.4;flex-shrink:0;width:28px;text-align:center;}
+.tut-body{display:flex;flex-direction:column;gap:4px;}
+.tut-ttl{font-family:'Bebas Neue',cursive;font-size:18px;letter-spacing:0.1em;color:#ddd;}
+.tut-desc{font-size:12px;color:#777;line-height:1.6;}
+.tut-back-btn{width:100%;padding:18px;font-family:'Bebas Neue',cursive;font-size:24px;letter-spacing:0.15em;background:linear-gradient(135deg,var(--gold2),var(--gold));color:#111;border:none;border-radius:12px;cursor:pointer;box-shadow:0 0 20px rgba(255,160,0,0.4);}
+</style>
+<body>
+
+<div id="flash"></div>
+<div class="premium-label" id="premiumLabel"></div>
+
+<!-- FIXED TOP AD -->
+<!-- AdMob差し替え: <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script> -->
+<div class="fixed-ad" id="ad-top">
+  <span class="fad-tag">広告</span>
+  <span class="fad-txt">🎰 スロット好きなら絶対ハマる無料アプリ！</span>
+  <button class="fad-btn">無料DL</button>
+</div>
+
+<!-- FIXED BOTTOM AD -->
+<!-- AdMob差し替え: data-ad-client="ca-pub-XXXXXXXXXXXXXXXX" data-ad-slot="XXXXXXXXXX" -->
+<div class="fixed-ad" id="ad-bottom">
+  <span class="fad-tag">広告</span>
+  <span class="fad-txt">📲 lucky LAMPをホーム画面に追加しよう</span>
+  <button class="fad-btn">追加</button>
+</div>
+
+<!-- OPENING -->
+<div class="screen active" id="s-opening">
+  <div class="op-wrap">
+    <div class="op-logo-small">lucky</div>
+    <div class="op-logo-big">LAMP</div>
+    <div class="op-progress"><div class="op-bar"></div></div>
+  </div>
+</div>
+
+<!-- AD -->
+<div class="screen" id="s-ad">
+  <div class="ad-card">
+    <div class="ad-close" onclick="closeAd()">✕</div>
+    <div class="ad-top">
+      <span class="ad-icon">🎰</span>
+      <div class="ad-title">スロット無料アプリ！</div>
+      <div class="ad-desc">毎日遊べる本格スロット。<br>今なら無料コイン1000枚プレゼント！</div>
+    </div>
+    <div class="ad-body">
+      <button class="ad-cta">今すぐダウンロード</button>
+      <div class="ad-note">広告</div>
+    </div>
+  </div>
+</div>
+
+<!-- GAME MENU -->
+<div class="screen" id="s-menu">
+  <div class="menu-wrap">
+    <div class="menu-logo">
+      <div class="ml-small">lucky</div>
+      <div class="ml-big">LAMP</div>
+    </div>
+    <div class="menu-card">
+      <div class="menu-sec-title">確率モード</div>
+      <div class="prob-grid">
+        <div class="ptab active" onclick="menuSetProb(this,50)">
+          <div class="pt-lbl">ノーマル</div>
+          <div class="pt-val">1 / 50</div>
+        </div>
+        <div class="ptab" onclick="menuSetProb(this,25)">
+          <div class="pt-lbl">ハーフ</div>
+          <div class="pt-val">1 / 25</div>
+        </div>
+        <div class="ptab ptab-free" id="freeTab" onclick="menuSetProb(this,'free')">
+          <div class="pt-lbl">フリー（自由設定）</div>
+          <div class="pt-val" id="freeTabVal">1 / 50</div>
+        </div>
+      </div>
+      <div class="free-slider" id="menuFreeSlider">
+        <div class="sl-row">
+          <span class="sl-lbl">確率（マックス 250）</span>
+          <span class="sl-val" id="menuSlVal">1 / 50</span>
+        </div>
+        <input type="range" id="menuProbSlider" min="1" max="250" value="50" oninput="menuOnSlider(this.value)">
+      </div>
+    </div>
+    <button class="start-btn" onclick="startGame()">▶　ゲームスタート</button>
+    <button class="how-btn" onclick="showTutorial()">？　遊び方</button>
+  </div>
+</div>
+
+<!-- TUTORIAL SCREEN -->
+<div class="screen" id="s-tutorial">
+  <div class="tutorial-wrap">
+    <div class="tutorial-header">
+      <div class="tutorial-title">遊び方</div>
+      <div class="tutorial-close" onclick="closeTutorial()">✕</div>
+    </div>
+    <div class="tutorial-list">
+      <div class="tut-item">
+        <div class="tut-num">1</div>
+        <div class="tut-body">
+          <div class="tut-ttl">確率を設定する</div>
+          <div class="tut-desc">ゲームメニューで1/50・1/25・フリーから選択。フリーは最大1/250まで設定できます。</div>
+        </div>
+      </div>
+      <div class="tut-item">
+        <div class="tut-num">2</div>
+        <div class="tut-body">
+          <div class="tut-ttl">ボタンをタップ</div>
+          <div class="tut-desc">シルバーのボタンをタップするたびに抽選。設定した確率でラッキーランプが点灯します。</div>
+        </div>
+      </div>
+      <div class="tut-item">
+        <div class="tut-num">3</div>
+        <div class="tut-body">
+          <div class="tut-ttl">LUCKY文字に注目！</div>
+          <div class="tut-desc">ランプ下の「LUCKY」文字が光ったらプレミア演出の予告。次のタップで特別な点灯演出が見られます。</div>
+        </div>
+      </div>
+      <div class="tut-item">
+        <div class="tut-num">4</div>
+        <div class="tut-body">
+          <div class="tut-ttl">プレミア演出</div>
+          <div class="tut-desc">1/10の確率で特別演出が発生。🌈レインボー・⚡フラッシュ・🌊ウェーブ・🎰ガコの4種類があります。</div>
+        </div>
+      </div>
+    </div>
+    <button class="tut-back-btn" onclick="closeTutorial()">▶　もどる</button>
+  </div>
+</div>
+
+<!-- GAME -->
+<div class="screen" id="s-game">
+  <div class="game-inner">
+    <div class="g-header">
+      <div class="g-logo">lucky <span>LAMP</span></div>
+      <div class="g-menu-btn" onclick="openDrawer()">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+
+    <div class="turn-display">
+      <div class="turn-left">
+        <div class="turn-lbl">現在の回転数</div>
+        <div class="turn-num" id="turnNum">0</div>
+      </div>
+      <div class="turn-right">
+        <div class="prob-pill" id="probPill">1/50</div>
+        <div class="hit-info">通算 <span id="hitTotal">0</span> HIT</div>
+      </div>
+    </div>
+
+    <div class="lamp-section">
+      <div class="gogo-body">
+
+        <!-- ネオンサイン -->
+        <div class="gogo-sign">
+          <div class="gogo-sign-text">lucky LAMP</div>
+        </div>
+
+        <div class="gogo-neon-bar"></div>
+
+        <!-- 中央1灯 -->
+        <div class="gogo-grid">
+          <div class="gogo-lamp" id="lu0">
+            <div class="gogo-socket" id="lg0"><div class="gogo-bulb"></div></div>
+            <div class="gogo-stem"></div>
+            <div class="gogo-lbl">LUCKY</div>
+          </div>
+        </div>
+
+        <div class="gogo-neon-bar"></div>
+
+      </div>
+    </div>
+
+    <div class="tap-wrap">
+      <button class="tap-btn" id="tapBtn" onclick="tryLuck()"></button>
+    </div>
+  </div>
+</div>
+
+<!-- IN-GAME DRAWER -->
+<div id="ig-overlay" onclick="closeDrawer()"></div>
+<div id="ig-drawer">
+  <div class="drawer-header">
+    <div class="drawer-title">⚙ 設定</div>
+    <div class="drawer-close" onclick="closeDrawer()">✕</div>
+  </div>
+  <div>
+    <div class="drawer-sec">確率モード</div>
+    <div class="drawer-prob-grid">
+      <div class="dp-tab active" id="dt50" onclick="drawerSetProb(this,50)">
+        <div class="dp-lbl">ノーマル</div><div class="dp-val">1/50</div>
+      </div>
+      <div class="dp-tab" id="dt25" onclick="drawerSetProb(this,25)">
+        <div class="dp-lbl">ハーフ</div><div class="dp-val">1/25</div>
+      </div>
+      <div class="dp-tab" id="dtFree" onclick="drawerSetProb(this,'free')" style="grid-column:span 2">
+        <div class="dp-lbl">フリー</div><div class="dp-val" id="dtFreeVal">1/50</div>
+      </div>
+    </div>
+  </div>
+  <div class="dp-free" id="dpFree">
+    <div class="sl-row">
+      <span class="sl-lbl">確率（マックス 250）</span>
+      <span class="sl-val" id="dpSlVal">1 / 50</span>
+    </div>
+    <input type="range" id="dpSlider" min="1" max="250" value="50" oninput="dpOnSlider(this.value)">
+  </div>
+  <button class="reset-btn" onclick="resetCount()">🔄 カウントリセット</button>
+  <button class="preview-btn" onclick="openPreview()">🎬 演出プレビュー</button>
+  <button class="sound-btn" id="soundBtn" onclick="toggleSound()">🔊 サウンド ON</button>
+</div>
+
+<!-- PREVIEW SCREEN -->
+<div class="screen" id="s-preview">
+  <div class="preview-wrap">
+    <div class="preview-header">
+      <div class="preview-title">🎬 演出プレビュー</div>
+      <div class="preview-close" onclick="closePreview()">✕</div>
+    </div>
+
+    <!-- ミニランプ表示エリア -->
+    <div class="preview-lamp-area">
+      <div class="preview-lamp-unit">
+        <div class="gogo-socket" id="pvSocket" style="width:100px;height:100px;">
+          <div class="gogo-bulb"></div>
+        </div>
+        <div class="gogo-stem"></div>
+        <div class="gogo-lbl" id="pvLbl">LUCKY</div>
+      </div>
+      <div class="preview-effect-name" id="pvEffectName">演出を選んでください</div>
+    </div>
+
+    <!-- 演出ボタン一覧 -->
+    <div class="preview-list">
+
+      <div class="preview-sec">先行演出</div>
+      <div class="preview-btns">
+        <button class="pv-btn" onclick="previewSenko('normal')">
+          <span class="pv-icon">✨</span>
+          <span class="pv-name">通常先行</span>
+          <span class="pv-desc">金色にじわっと光る</span>
+        </button>
+        <button class="pv-btn" onclick="previewSenko('rainbow')">
+          <span class="pv-icon">🌈</span>
+          <span class="pv-name">虹色先行</span>
+          <span class="pv-desc">虹色に光りながら先行</span>
+        </button>
+        <button class="pv-btn" onclick="previewSenko('flash')">
+          <span class="pv-icon">⚡</span>
+          <span class="pv-name">激しく先行</span>
+          <span class="pv-desc">激しく点滅して先行</span>
+        </button>
+      </div>
+
+      <div class="preview-sec">点灯演出</div>
+      <div class="preview-btns">
+        <button class="pv-btn" onclick="previewLamp(null)">
+          <span class="pv-icon">💡</span>
+          <span class="pv-name">通常点灯</span>
+          <span class="pv-desc">金色パルスグロー</span>
+        </button>
+        <button class="pv-btn" onclick="previewLamp('rainbow')">
+          <span class="pv-icon">🌈</span>
+          <span class="pv-name">レインボー</span>
+          <span class="pv-desc">虹色に変化しながら点灯</span>
+        </button>
+        <button class="pv-btn" onclick="previewLamp('flash')">
+          <span class="pv-icon">⚡</span>
+          <span class="pv-name">フラッシュ</span>
+          <span class="pv-desc">激しく点滅しながら点灯</span>
+        </button>
+        <button class="pv-btn" onclick="previewLamp('wave')">
+          <span class="pv-icon">🌊</span>
+          <span class="pv-name">ウェーブ</span>
+          <span class="pv-desc">色が波のように変化</span>
+        </button>
+        <button class="pv-btn" onclick="previewGako()">
+          <span class="pv-icon">🎰</span>
+          <span class="pv-name">ガコ点灯</span>
+          <span class="pv-desc">ガコガコ鳴って点灯</span>
+        </button>
+      </div>
+
+      <div class="preview-sec">フル演出（先行→点灯）</div>
+      <div class="preview-btns">
+        <button class="pv-btn pv-full" onclick="previewFull('normal',null)">
+          <span class="pv-icon">💡</span>
+          <span class="pv-name">通常フル</span>
+        </button>
+        <button class="pv-btn pv-full" onclick="previewFull('rainbow','rainbow')">
+          <span class="pv-icon">🌈</span>
+          <span class="pv-name">レインボーフル</span>
+        </button>
+        <button class="pv-btn pv-full" onclick="previewFull('flash','flash')">
+          <span class="pv-icon">⚡</span>
+          <span class="pv-name">フラッシュフル</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- RETRY -->
+<div class="screen" id="s-retry">
+  <div class="retry-card">
+    <div class="retry-top">
+
+      <!-- スロットリール -->
+      <div class="slot-machine">
+        <div class="slot-frame">
+          <div class="slot-reel-wrap">
+            <div class="slot-reel" id="reel0">
+              <div class="slot-sym">🍋</div>
+              <div class="slot-sym">⭐</div>
+              <div class="slot-sym">🍒</div>
+              <div class="slot-sym">💎</div>
+              <div class="slot-sym">7️⃣</div>
+              <div class="slot-sym">🍋</div>
+              <div class="slot-sym">⭐</div>
+              <div class="slot-sym">7️⃣</div>
+            </div>
+          </div>
+          <div class="slot-reel-wrap">
+            <div class="slot-reel" id="reel1">
+              <div class="slot-sym">🍒</div>
+              <div class="slot-sym">7️⃣</div>
+              <div class="slot-sym">💎</div>
+              <div class="slot-sym">⭐</div>
+              <div class="slot-sym">🍋</div>
+              <div class="slot-sym">🍒</div>
+              <div class="slot-sym">7️⃣</div>
+              <div class="slot-sym">⭐</div>
+            </div>
+          </div>
+          <div class="slot-reel-wrap">
+            <div class="slot-reel" id="reel2">
+              <div class="slot-sym">💎</div>
+              <div class="slot-sym">🍋</div>
+              <div class="slot-sym">⭐</div>
+              <div class="slot-sym">🍒</div>
+              <div class="slot-sym">7️⃣</div>
+              <div class="slot-sym">💎</div>
+              <div class="slot-sym">🍋</div>
+              <div class="slot-sym">7️⃣</div>
+            </div>
+          </div>
+          <!-- 中央ライン -->
+          <div class="slot-line" id="slot-line"></div>
+        </div>
+        <div class="slot-label">lucky LAMP</div>
+      </div>
+
+    </div>
+    <div class="retry-body">
+      <div class="retry-ad">
+        <span class="r-ad-tag">広告</span>
+        <span class="r-ad-txt">🎰 本格スロットアプリで遊ぼう！</span>
+        <button class="r-ad-btn">詳しく</button>
+      </div>
+      <div class="share-row">
+        <button class="share-btn share-x" onclick="shareX()">𝕏 ポスト</button>
+        <button class="share-btn share-menu" onclick="goMenu()">☰ ゲームメニュー</button>
+      </div>
+      <button class="retry-again" onclick="retryGame()">🔆 もう一度</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ===== STATE ===== */
+let denom = 50;
+let turns = 0, totalTurns = 0, hits = 0;
+let busy = false;
+
+/* ===== SCREEN ===== */
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+/* ===== OPENING → AD ===== */
+setTimeout(()=>showScreen('s-ad'), 3900);
+
+/* ===== AD → MENU ===== */
+function closeAd(){ showScreen('s-menu'); }
+
+/* ===== MENU PROB ===== */
+function menuSetProb(el, mode){
+  document.querySelectorAll('#s-menu .ptab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  const fs = document.getElementById('menuFreeSlider');
+  if(mode==='free'){
+    fs.classList.add('show');
+    menuOnSlider(document.getElementById('menuProbSlider').value);
+  } else {
+    fs.classList.remove('show');
+    denom = mode;
+  }
+}
+function menuOnSlider(v){
+  denom = parseInt(v);
+  document.getElementById('menuSlVal').textContent = `1 / ${denom}`;
+  document.getElementById('freeTabVal').textContent = `1 / ${denom}`;
+}
+
+/* ===== START ===== */
+function startGame(){
+  turns = 0;
+  document.getElementById('turnNum').textContent = '0';
+  document.getElementById('probPill').textContent = `1/${denom}`;
+  document.getElementById('hitTotal').textContent = hits;
+  syncDrawerProb();
+  showScreen('s-game');
+  clearSenko();
+  // 次が当たりかどうかを先読みして予告
+  scheduleNextSenko();
+}
+
+/* ===== IN-GAME DRAWER ===== */
+function openDrawer(){
+  document.getElementById('ig-overlay').classList.add('open');
+  document.getElementById('ig-drawer').classList.add('open');
+}
+function closeDrawer(){
+  document.getElementById('ig-overlay').classList.remove('open');
+  document.getElementById('ig-drawer').classList.remove('open');
+}
+function drawerSetProb(el, mode){
+  document.querySelectorAll('.dp-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  const dp = document.getElementById('dpFree');
+  if(mode==='free'){
+    dp.classList.add('show');
+    dpOnSlider(document.getElementById('dpSlider').value);
+  } else {
+    dp.classList.remove('show');
+    denom = mode;
+    document.getElementById('probPill').textContent = `1/${denom}`;
+  }
+}
+function dpOnSlider(v){
+  denom = parseInt(v);
+  document.getElementById('dpSlVal').textContent = `1 / ${denom}`;
+  document.getElementById('dtFreeVal').textContent = `1/${denom}`;
+  document.getElementById('probPill').textContent = `1/${denom}`;
+}
+function syncDrawerProb(){
+  // sync drawer to current denom on game start
+  document.getElementById('dpSlider').value = denom;
+  document.getElementById('dpSlVal').textContent = `1 / ${denom}`;
+  document.getElementById('dtFreeVal').textContent = `1/${denom}`;
+}
+function resetCount(){
+  turns=0; totalTurns=0; hits=0;
+  document.getElementById('turnNum').textContent='0';
+  document.getElementById('hitTotal').textContent='0';
+  closeDrawer();
+}
+
+/* ===== SOUND ===== */
+let soundOn = true;
+function toggleSound(){
+  soundOn = !soundOn;
+  const btn = document.getElementById('soundBtn');
+  btn.textContent = soundOn ? '🔊 サウンド ON' : '🔇 サウンド OFF';
+  btn.classList.toggle('off', !soundOn);
+}
+
+/* ===== TUTORIAL ===== */
+function showTutorial(){ showScreen('s-tutorial'); }
+function closeTutorial(){ showScreen('s-menu'); }
+
+/* ===== AUDIO ===== */
+let ac=null;
+function getAC(){if(!ac)ac=new(window.AudioContext||window.webkitAudioContext)();return ac;}
+function playWin(){ if(!soundOn) return;
+  const c=getAC(),t=c.currentTime;
+  const ob=c.createOscillator(),gb=c.createGain();
+  ob.connect(gb);gb.connect(c.destination);
+  ob.type='sine';ob.frequency.value=100;
+  gb.gain.setValueAtTime(0.5,t);gb.gain.exponentialRampToValueAtTime(0.001,t+0.28);
+  ob.start(t);ob.stop(t+0.3);
+  [[0,523],[0.07,659],[0.13,784],[0.19,1046],[0.28,1319],[0.38,1046],[0.46,784],[0.54,1046]]
+  .forEach(([dt,fr])=>{
+    const o=c.createOscillator(),g=c.createGain();
+    o.connect(g);g.connect(c.destination);
+    o.type='triangle';o.frequency.value=fr;
+    g.gain.setValueAtTime(0,t+dt);
+    g.gain.linearRampToValueAtTime(0.2,t+dt+0.03);
+    g.gain.exponentialRampToValueAtTime(0.001,t+dt+0.25);
+    o.start(t+dt);o.stop(t+dt+0.28);
+  });
+}
+function playMiss(){ if(!soundOn) return;
+  const c=getAC(),t=c.currentTime;
+  const o=c.createOscillator(),g=c.createGain();
+  o.connect(g);g.connect(c.destination);
+  o.type='triangle';
+  o.frequency.setValueAtTime(160,t);o.frequency.linearRampToValueAtTime(70,t+0.15);
+  g.gain.setValueAtTime(0.09,t);g.gain.exponentialRampToValueAtTime(0.001,t+0.18);
+  o.start(t);o.stop(t+0.2);
+}
+
+/* ===== ガコ音 ===== */
+function playGako(){ if(!soundOn) return;
+  const c=getAC(), t=c.currentTime;
+
+  // ① 太いノイズバースト（メインの「ガコ」）
+  const buf=c.createBuffer(1, c.sampleRate*0.12, c.sampleRate);
+  const d=buf.getChannelData(0);
+  for(let i=0;i<d.length;i++){
+    const env = Math.exp(-i/(c.sampleRate*0.04));
+    d[i]=(Math.random()*2-1)*env;
+  }
+  const src=c.createBufferSource();
+  src.buffer=buf;
+  const bp=c.createBiquadFilter();
+  bp.type='bandpass'; bp.frequency.value=600; bp.Q.value=0.5;
+  const hp=c.createBiquadFilter();
+  hp.type='highpass'; hp.frequency.value=200;
+  const g1=c.createGain();
+  g1.gain.setValueAtTime(2.5,t);
+  g1.gain.exponentialRampToValueAtTime(0.001,t+0.12);
+  src.connect(bp); bp.connect(hp); hp.connect(g1); g1.connect(c.destination);
+  src.start(t); src.stop(t+0.13);
+
+  // ② 金属的な「カン」成分
+  const oMetal=c.createOscillator(), gMetal=c.createGain();
+  oMetal.connect(gMetal); gMetal.connect(c.destination);
+  oMetal.type='square';
+  oMetal.frequency.setValueAtTime(1200,t);
+  oMetal.frequency.exponentialRampToValueAtTime(300,t+0.08);
+  gMetal.gain.setValueAtTime(0.6,t);
+  gMetal.gain.exponentialRampToValueAtTime(0.001,t+0.09);
+  oMetal.start(t); oMetal.stop(t+0.1);
+
+  // ③ 低域の「ドスン」衝撃音
+  const oBass=c.createOscillator(), gBass=c.createGain();
+  oBass.connect(gBass); gBass.connect(c.destination);
+  oBass.type='sine';
+  oBass.frequency.setValueAtTime(180,t);
+  oBass.frequency.exponentialRampToValueAtTime(30,t+0.1);
+  gBass.gain.setValueAtTime(1.2,t);
+  gBass.gain.exponentialRampToValueAtTime(0.001,t+0.1);
+  oBass.start(t); oBass.stop(t+0.11);
+
+  // ④ 高域ノイズ「シャッ」
+  const buf2=c.createBuffer(1, c.sampleRate*0.03, c.sampleRate);
+  const d2=buf2.getChannelData(0);
+  for(let i=0;i<d2.length;i++) d2[i]=(Math.random()*2-1)*Math.exp(-i/(c.sampleRate*0.008));
+  const src2=c.createBufferSource();
+  src2.buffer=buf2;
+  const lp=c.createBiquadFilter();
+  lp.type='highpass'; lp.frequency.value=3000;
+  const g2=c.createGain();
+  g2.gain.setValueAtTime(0.8,t);
+  g2.gain.exponentialRampToValueAtTime(0.001,t+0.03);
+  src2.connect(lp); lp.connect(g2); g2.connect(c.destination);
+  src2.start(t); src2.stop(t+0.04);
+}
+
+/* ガコ演出：複数回ガコガコ → 各回に白フラッシュ → 最後に点灯 */
+function doGakoEffect(onComplete){
+  const sock=document.getElementById('lg0');
+  const times=[0, 300, 600, 900];
+  times.forEach((delay)=>{
+    setTimeout(()=>{
+      playGako();
+      sock.classList.add('gako-flash');
+      setTimeout(()=>sock.classList.remove('gako-flash'), 130);
+    }, delay);
+  });
+  setTimeout(()=>onComplete(), times[times.length-1]+220);
+}
+
+
+
+
+/* ===== LAMPS ===== */
+const PREMIUM_TYPES = ['rainbow','flash','wave','gako'];
+const PREMIUM_LABELS = {
+  rainbow: '🌈 レインボー点灯！',
+  flash:   '⚡ フラッシュ点灯！',
+  wave:    '🌊 ウェーブ点灯！',
+  gako:    '🎰 ガコ点灯！'
+};
+let currentPremium = null;
+
+/* 先行演出 */
+const SENKO_MAP = {
+  'normal':  null,
+  'rainbow': 'rainbow',
+  'flash':   'flash',
+};
+const SENKO_TYPES = ['normal','rainbow','flash'];
+
+function applySenko(type){
+  const lbl = document.getElementById('lu0').querySelector('.gogo-lbl');
+  if(!lbl) return;
+  lbl.classList.remove('senko-normal','senko-rainbow','senko-flash');
+  lbl.classList.add(`senko-${type}`);
+}
+function clearSenko(){
+  const lbl = document.getElementById('lu0').querySelector('.gogo-lbl');
+  if(!lbl) return;
+  lbl.classList.remove('senko-normal','senko-rainbow','senko-flash');
+}
+
+function lightOn(premium=null){
+  const sock = document.getElementById('lg0');
+  const unit = document.getElementById('lu0');
+  sock.classList.remove('on','premium-rainbow','premium-flash','premium-wave');
+  if(premium){
+    currentPremium = premium;
+    sock.classList.add('on', `premium-${premium}`);
+    const lbl = document.getElementById('premiumLabel');
+    lbl.textContent = PREMIUM_LABELS[premium];
+    lbl.className = `premium-label ${premium}`;
+    setTimeout(()=>lbl.classList.add('show'),100);
+  } else {
+    currentPremium = null;
+    sock.classList.add('on');
+  }
+  unit.classList.add('lit');
+}
+function lightOff(){
+  const sock = document.getElementById('lg0');
+  sock.classList.remove('on','premium-rainbow','premium-flash','premium-wave');
+  document.getElementById('lu0').classList.remove('lit');
+  const lbl = document.getElementById('premiumLabel');
+  if(lbl){ lbl.classList.remove('show'); setTimeout(()=>{ lbl.textContent=''; lbl.className='premium-label'; },400); }
+  clearSenko();
+  currentPremium = null;
+}
+function flashLamps(premium=null){
+  [0,80,160,240].forEach((d,i)=>setTimeout(()=>{
+    if(i%2===0) lightOn(i===2?premium:null); else lightOff();
+  },d));
+  setTimeout(()=>lightOn(premium), 320);
+}
+
+/* ===== PARTICLES ===== */
+function burst(x,y,n=55){
+  const cols=['#ffe040','#ffb800','#ff6600','#ff1133','#fff','#00ffee','#ff88ff','#ffff88'];
+  for(let i=0;i<n;i++){
+    const p=document.createElement('div');p.className='ptcl';
+    const s=4+Math.random()*14,col=cols[Math.floor(Math.random()*cols.length)];
+    p.style.cssText=`left:${x}px;top:${y}px;width:${s}px;height:${s}px;background:${col};box-shadow:0 0 ${s}px ${col};`;
+    const a=Math.random()*Math.PI*2,d=70+Math.random()*220;
+    p.style.setProperty('--tx',Math.cos(a)*d+'px');
+    p.style.setProperty('--ty',Math.sin(a)*d+'px');
+    p.style.setProperty('--dur',(0.45+Math.random()*0.8)+'s');
+    document.body.appendChild(p);setTimeout(()=>p.remove(),1400);
+  }
+}
+
+/* ===== NEXT HIT PREDICTION ===== */
+let nextIsHit = false;
+let nextPremium = null;
+let nextSenko = null;
+
+function scheduleNextSenko(){
+  nextIsHit = Math.random() < (1/denom);
+  if(nextIsHit){
+    const isPremium = Math.random() < (1/10);
+    nextPremium = isPremium ? PREMIUM_TYPES[Math.floor(Math.random()*PREMIUM_TYPES.length)] : null;
+    // 先行点灯はプレミアの時だけ
+    if(nextPremium){
+      if(nextPremium === 'rainbow') nextSenko = 'rainbow';
+      else if(nextPremium === 'flash') nextSenko = 'flash';
+      else nextSenko = 'normal';
+      applySenko(nextSenko);
+    } else {
+      nextSenko = null;
+      clearSenko();
+    }
+  } else {
+    nextPremium = null;
+    nextSenko = null;
+    clearSenko();
+  }
+}
+
+/* ===== MAIN ===== */
+
+function tryLuck(){
+  if(busy)return;
+  busy=true;
+  turns++;totalTurns++;
+  document.getElementById('turnNum').textContent=turns;
+
+  const hit = nextIsHit;
+  const premiumType = nextPremium;
+
+  if(hit){
+    hits++;
+    document.getElementById('hitTotal').textContent=hits;
+
+    // 即座にランプ点灯（gakoのみ遅延あり）
+    clearSenko();
+    if(premiumType === 'gako'){
+      doGakoEffect(()=>{
+        document.getElementById('flash').classList.add('go');
+        flashLamps('gako');
+        playWin();
+        const lc=document.getElementById('lg0').getBoundingClientRect();
+        const cx=lc.left+lc.width/2,cy=lc.top+lc.height/2;
+        burst(cx,cy,60);
+        setTimeout(()=>burst(cx,cy,40),320);
+        setTimeout(()=>burst(cx,cy,30),640);
+      });
+    } else {
+      document.getElementById('flash').classList.add('go');
+      flashLamps(premiumType);
+      playWin();
+      const lc=document.getElementById('lg0').getBoundingClientRect();
+      const cx=lc.left+lc.width/2,cy=lc.top+lc.height/2;
+      burst(cx,cy,60);
+      setTimeout(()=>burst(cx,cy,40),320);
+      setTimeout(()=>burst(cx,cy,30),640);
+    }
+
+    const retryDelay = premiumType === 'gako' ? 4200 : 3000;
+    setTimeout(()=>{
+      document.getElementById('flash').classList.remove('go');
+      showScreen('s-retry');
+      startSlotAnimation();
+      busy=false;
+    }, retryDelay);
+
+  } else {
+    playMiss();
+    const btn=document.getElementById('tapBtn');
+    btn.style.opacity='0.65';
+    setTimeout(()=>{
+      btn.style.opacity='';
+      // 次のタップの予告を再計算
+      scheduleNextSenko();
+      busy=false;
+    },220);
+  }
+}
+
+/* ===== PREVIEW ===== */
+let pvTimer = null;
+
+function openPreview(){
+  closeDrawer();
+  pvResetLamp();
+  showScreen('s-preview');
+}
+function closePreview(){
+  pvResetLamp();
+  showScreen('s-game');
+}
+function pvResetLamp(){
+  if(pvTimer){ clearTimeout(pvTimer); pvTimer=null; }
+  const sock = document.getElementById('pvSocket');
+  sock.classList.remove('on','premium-rainbow','premium-flash','premium-wave');
+  const lbl = document.getElementById('pvLbl');
+  lbl.classList.remove('senko-normal','senko-rainbow','senko-flash');
+  lbl.style.color='';lbl.style.textShadow='';
+  document.getElementById('pvEffectName').textContent='演出を選んでください';
+  document.getElementById('pvEffectName').style.color='#555';
+}
+function pvSetEffectName(name, color='#ccc'){
+  document.getElementById('pvEffectName').textContent = name;
+  document.getElementById('pvEffectName').style.color = color;
+}
+
+function previewSenko(type){
+  pvResetLamp();
+  const lbl = document.getElementById('pvLbl');
+  lbl.classList.add(`senko-${type}`);
+  const names = {normal:'✨ 通常先行', rainbow:'🌈 虹色先行', flash:'⚡ 激しく先行'};
+  pvSetEffectName(names[type], type==='rainbow'?'#ff88ff':type==='flash'?'var(--gold)':'var(--gold)');
+}
+
+function previewLamp(type){
+  pvResetLamp();
+  const sock = document.getElementById('pvSocket');
+  sock.classList.add('on');
+  if(type) sock.classList.add(`premium-${type}`);
+  const names = {null:'💡 通常点灯', rainbow:'🌈 レインボー点灯', flash:'⚡ フラッシュ点灯', wave:'🌊 ウェーブ点灯'};
+  pvSetEffectName(names[type]||'💡 通常点灯', type==='rainbow'?'#ff88ff':type==='wave'?'#88ffff':'var(--gold)');
+}
+
+function previewGako(){
+  pvResetLamp();
+  pvSetEffectName('🎰 ガコ点灯', 'var(--gold)');
+  const sock = document.getElementById('pvSocket');
+  doGakoEffect(()=>{
+    sock.classList.add('on','premium-gako');
+    pvSetEffectName('🎰 ガコ点灯！', 'var(--gold)');
+  });
+}
+function previewFull(senkoType, lampType){
+  pvResetLamp();
+  // 先行
+  const lbl = document.getElementById('pvLbl');
+  lbl.classList.add(`senko-${senkoType}`);
+  const names = {null:'💡 通常フル', rainbow:'🌈 レインボーフル', flash:'⚡ フラッシュフル'};
+  pvSetEffectName('先行中…', '#aaa');
+  // 0.5秒後に点灯
+  pvTimer = setTimeout(()=>{
+    lbl.classList.remove(`senko-${senkoType}`);
+    const sock = document.getElementById('pvSocket');
+    sock.classList.add('on');
+    if(lampType) sock.classList.add(`premium-${lampType}`);
+    pvSetEffectName(names[lampType]||'💡 通常フル', lampType==='rainbow'?'#ff88ff':'var(--gold)');
+  }, 500);
+}
+
+
+const SYM_H = 100; // px per symbol
+
+function spinReel(reelId, stopDelay, targetIndex){
+  const reel = document.getElementById(reelId);
+  const total = reel.children.length;
+  // fast scroll via CSS animation
+  let pos = 0;
+  const speed = 18; // ms per step
+  const fastSteps = 30;
+  let step = 0;
+
+  const ticker = setInterval(()=>{
+    step++;
+    pos = (pos + 1) % total;
+    reel.style.transform = `translateY(-${pos * SYM_H}px)`;
+    reel.style.transition = 'none';
+  }, speed);
+
+  setTimeout(()=>{
+    clearInterval(ticker);
+    // ease to target (7️⃣)
+    const finalPos = targetIndex * SYM_H;
+    reel.style.transition = `transform 0.5s cubic-bezier(.2,.8,.3,1.1)`;
+    reel.style.transform = `translateY(-${finalPos}px)`;
+  }, stopDelay);
+}
+
+function startSlotAnimation(){
+  ['reel0','reel1','reel2'].forEach(id=>{
+    const r = document.getElementById(id);
+    if(!r) return;
+    r.style.transition = 'none';
+    r.style.transform = 'translateY(0)';
+  });
+  const sl = document.getElementById('slot-line');
+  if(sl) sl.classList.remove('win');
+  const slbl = document.querySelector('.slot-label');
+  if(slbl) slbl.classList.remove('show');
+
+  const targetIdx = 4;
+  spinReel('reel0', 900,  targetIdx);
+  spinReel('reel1', 1400, targetIdx);
+  spinReel('reel2', 1900, targetIdx);
+
+  setTimeout(()=>{
+    if(sl) sl.classList.add('win');
+    if(slbl) slbl.classList.add('show');
+  }, 2300);
+}
+
+
+function retryGame(){
+  turns=0;
+  lightOff();
+  document.getElementById('turnNum').textContent='0';
+  showScreen('s-game');
+  clearSenko();
+  scheduleNextSenko();
+}
+
+/* ===== SHARE ===== */
+function goMenu(){
+  turns=0;
+  lightOff();
+  clearSenko();
+  document.getElementById('turnNum').textContent='0';
+  showScreen('s-menu');
+}
+function shareX(){
+  const txt=encodeURIComponent(`🔆 lucky LAMPが点灯！\n${turns}回転で当選（確率1/${denom}）\n#luckyLAMP`);
+  window.open(`https://twitter.com/intent/tweet?text=${txt}`,'_blank');
+}
+
+
+</script>
+</body>
+</html>
