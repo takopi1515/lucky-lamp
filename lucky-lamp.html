@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>lucky LAMP</title>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-app-pub-8005121153808039" crossorigin="anonymous"></script>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
@@ -826,19 +827,23 @@ input[type=range]::-webkit-slider-thumb{
 <div class="premium-label" id="premiumLabel"></div>
 
 <!-- FIXED TOP AD -->
-<!-- AdMob差し替え: <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script> -->
 <div class="fixed-ad" id="ad-top">
-  <span class="fad-tag">広告</span>
-  <span class="fad-txt">🎰 スロット好きなら絶対ハマる無料アプリ！</span>
-  <button class="fad-btn">無料DL</button>
+  <ins class="adsbygoogle"
+    style="display:block;width:100%;height:44px;"
+    data-ad-client="ca-app-pub-8005121153808039"
+    data-ad-slot="5106874095"
+    data-ad-format="banner"
+    data-full-width-responsive="false"></ins>
 </div>
 
 <!-- FIXED BOTTOM AD -->
-<!-- AdMob差し替え: data-ad-client="ca-pub-XXXXXXXXXXXXXXXX" data-ad-slot="XXXXXXXXXX" -->
 <div class="fixed-ad" id="ad-bottom">
-  <span class="fad-tag">広告</span>
-  <span class="fad-txt">📲 lucky LAMPをホーム画面に追加しよう</span>
-  <button class="fad-btn">追加</button>
+  <ins class="adsbygoogle"
+    style="display:block;width:100%;height:44px;"
+    data-ad-client="ca-app-pub-8005121153808039"
+    data-ad-slot="3793792428"
+    data-ad-format="banner"
+    data-full-width-responsive="false"></ins>
 </div>
 
 <!-- OPENING -->
@@ -1195,8 +1200,24 @@ function showScreen(id){
   document.getElementById(id).classList.add('active');
 }
 
-/* ===== OPENING → AD ===== */
-setTimeout(()=>showScreen('s-ad'), 3900);
+/* ===== OPENING → 広告 ===== */
+setTimeout(()=>{
+  // AdMob WebView環境では本物のインタースティシャルを表示
+  if(window.AdMob){
+    window.AdMob.prepareInterstitial({
+      adId: 'ca-app-pub-8005121153808039/9345502004',
+      autoShow: false
+    });
+    window.AdMob.showInterstitial();
+    // 広告終了後にメニューへ
+    document.addEventListener('admob.interstitial.events.CLOSE', ()=>{
+      showScreen('s-menu');
+    }, {once:true});
+  } else {
+    // Web環境ではモック広告を表示
+    showScreen('s-ad');
+  }
+}, 3900);
 
 /* ===== AD → MENU ===== */
 function closeAd(){ showScreen('s-menu'); }
@@ -1272,6 +1293,36 @@ function resetCount(){
   document.getElementById('turnNum').textContent='0';
   document.getElementById('hitTotal').textContent='0';
   closeDrawer();
+}
+
+/* ===== ADMOB ===== */
+// バナー広告初期化
+window.addEventListener('load', ()=>{
+  try{
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    (adsbygoogle = window.adsbygoogle || []).push({});
+  }catch(e){}
+});
+
+// インタースティシャル広告（リトライ画面前）
+let interstitialAd = null;
+function loadInterstitial(){
+  try{
+    window.adsbygoogle = window.adsbygoogle || [];
+    interstitialAd = {
+      slotId: 'ca-app-pub-8005121153808039/9345502004'
+    };
+  }catch(e){}
+}
+function showInterstitial(callback){
+  // AdMob WebView環境では下記コードで表示
+  try{
+    if(window.AdMob){
+      window.AdMob.showInterstitial();
+    }
+  }catch(e){}
+  // フォールバック：即callback
+  if(callback) callback();
 }
 
 /* ===== SOUND ===== */
@@ -1540,8 +1591,10 @@ function tryLuck(){
     const retryDelay = premiumType === 'gako' ? 4200 : 3000;
     setTimeout(()=>{
       document.getElementById('flash').classList.remove('go');
-      showScreen('s-retry');
-      startSlotAnimation();
+      showInterstitial(()=>{
+        showScreen('s-retry');
+        startSlotAnimation();
+      });
       busy=false;
     }, retryDelay);
 
